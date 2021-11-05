@@ -11,6 +11,6 @@ output:
 
 Welcome to my website. I am a first-year MS student in Biostatistics at the Mailman School of Public Health and previously a laboratory scientist in the Blaser Lab at the Center for Advanced Biotechnology and Medicine.
 
-To read more about my experience, click [here](about.Rmd)
+To read more about my experience, click [here](about.html)
 
 <iframe src="https://drive.google.com/file/d/1pawaRdf5PHWnsMRNvCOPPSdyGFA3dly5/preview" width="640" height="480" allow="autoplay"></iframe>

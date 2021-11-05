@@ -7,4 +7,8 @@ output:
     theme: spacelab
 ---
 
+# Resume
 
+<object width="500" height="375" 
+ type="application/pdf" data="Jesse_R_Ames_Resume_9_29_21.pdf">
+</object>
