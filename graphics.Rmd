@@ -24,8 +24,7 @@ ny_month <- nydat %>%
   janitor::clean_names() %>%
   #Separate date into year, month, day
   mutate(year = year(date),
-         month = month(date),
-         day = day(date)) %>%
+         month = month(date)) %>%
   #Convert from tenths of a degree to degrees Celsius
   mutate(tmax = tmax/10,
          tmin = tmin/10) %>%
@@ -41,12 +40,12 @@ station_no <- ny_month %>% pull(id) %>% unique() %>% length()
 Column {data-width=600}
 -----
 
-### Monthly average daily high in NY state across `r station_no` weather stations, 1981-2010
+### Monthly mean daily high temperature in NY state across `r station_no` weather stations, 1981-2010
 
 ```{r}
 ny_month %>%
   group_by(year, month) %>%
-  summarize(tmax = mean(tmax), tmin = mean(tmin)) %>%
+  summarize(tmax = mean(tmax)) %>%
   ungroup() %>%
   plot_ly(
     y = ~ tmax, x = ~ year, type = "scatter", mode = "lines+markers", color = ~ month, colors = "viridis", split = month
@@ -69,13 +68,13 @@ Column {data-width=400}
          yaxis = list(title = "Temperature (°C)"))
 ```
 
-### Percentage of 30°C+ or higher high measurements in NY state across `r station_no` weather stations, 1981-2010
+### Percentage of 30°C+ or higher daily high measurements in NY state across `r station_no` weather stations, 1981-2010
 
 ```{r}
 ny_month %>%
   mutate(is_30 = tmax >= 30) %>%
   group_by(year) %>%
-  summarise(pct = mean(is_30)*100)
+  summarise(pct = mean(is_30)*100) %>%
   plot_ly(
     y = ~ pct, x = ~ year, type = "bar", colors = "viridis", color = ~ pct
     ) %>% layout(
