@@ -1,0 +1,84 @@
+---
+title: "Interactive Graphics with `plotly`"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    source_code: embed
+    theme: spacelab
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(flexdashboard)
+library(plotly)
+library(lubridate)
+```
+
+```{r}
+load("nynoaadat.RData")
+
+ny_month <- nydat %>%
+  #Complete data only
+  drop_na() %>%
+  janitor::clean_names() %>%
+  #Separate date into year, month, day
+  mutate(year = year(date),
+         month = month(date),
+         day = day(date)) %>%
+  #Convert from tenths of a degree to degrees Celsius
+  mutate(tmax = tmax/10,
+         tmin = tmin/10) %>%
+  #Recode the months
+  mutate(month = recode_factor(month,
+    `1` = "Jan", `2` = "Feb", `3` = "Mar", `4` = "Apr",
+    `5` = "May", `6` = "Jun", `7` = "Jul", `8` = "Aug",
+    `9` = "Sep", `10`  = "Oct", `11` = "Nov", `12` = "Dec"))
+
+station_no <- ny_month %>% pull(id) %>% unique() %>% length()
+```
+
+Column {data-width=600}
+-----
+
+### Monthly average daily high in NY state across `r station_no` weather stations, 1981-2010
+
+```{r}
+ny_month %>%
+  group_by(year, month) %>%
+  summarize(tmax = mean(tmax), tmin = mean(tmin)) %>%
+  ungroup() %>%
+  plot_ly(
+    y = ~ tmax, x = ~ year, type = "scatter", mode = "lines+markers", color = ~ month, colors = "viridis", split = month
+  ) %>% layout(
+         xaxis = list(title = "Year"),
+         yaxis = list(title = "Temperature (°C)"))
+```
+
+Column {data-width=400}
+-----
+
+### Distribution of daily highs by month in NY state across `r station_no` weather stations, 1981-2010
+
+```{r}
+  plot_ly(
+    y = ~ tmax, color = ~ month, type = "box",
+    colors = "viridis", data = ny_month
+  ) %>% layout(
+         xaxis = list(title = "Month"),
+         yaxis = list(title = "Temperature (°C)"))
+```
+
+### Percentage of 30°C+ or higher high measurements in NY state across `r station_no` weather stations, 1981-2010
+
+```{r}
+ny_month %>%
+  mutate(is_30 = tmax >= 30) %>%
+  group_by(year) %>%
+  summarise(pct = mean(is_30)*100)
+  plot_ly(
+    y = ~ pct, x = ~ year, type = "bar", colors = "viridis", color = ~ pct
+    ) %>% layout(
+         xaxis = list(title = "Year"),
+         yaxis = list(title = "Percentage of >30°C measurements"))
+```
